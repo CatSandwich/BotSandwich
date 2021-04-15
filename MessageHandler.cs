@@ -1,12 +1,10 @@
-﻿using Discord.WebSocket;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Net.Http;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace MeatBot
+namespace BotSandwich
 {
     /// <summary>
     /// Holds httpclient for raw messages and other string methods. 

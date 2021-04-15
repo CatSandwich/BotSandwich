@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using BotSandwich.Data;
+using BotSandwich.Data.Commands;
 using Discord.WebSocket;
 
 namespace BotSandwich.Modules.Utils.Commands

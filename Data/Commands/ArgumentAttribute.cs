@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Discord;
 
-namespace BotSandwich.Data
+namespace BotSandwich.Data.Commands
 {
     /// <summary>
     /// Tells the command to listen for an argument and populate this field when provided.

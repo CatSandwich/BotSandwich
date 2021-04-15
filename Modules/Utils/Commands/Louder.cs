@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using BotSandwich.Data;
+using BotSandwich.Data.Commands;
 using Discord;
 using Discord.WebSocket;
 

@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace BotSandwich.Data
+namespace BotSandwich.Data.Commands
 {
     class ParseException : Exception
     {

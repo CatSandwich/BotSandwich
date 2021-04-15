@@ -6,7 +6,7 @@ using BotSandwich.Commands;
 using Discord;
 using Discord.WebSocket;
 
-namespace BotSandwich.Data
+namespace BotSandwich.Data.Commands
 {
     public class CommandHandler
     {

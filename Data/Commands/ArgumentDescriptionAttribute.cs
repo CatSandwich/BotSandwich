@@ -1,7 +1,6 @@
 ﻿using System;
-using System.ComponentModel;
 
-namespace BotSandwich.Data
+namespace BotSandwich.Data.Commands
 {
     class ArgumentDescriptionAttribute : Attribute
     {

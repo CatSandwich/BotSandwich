@@ -1,19 +1,13 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
-using System.Net.Sockets;
 using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
-using Microsoft.VisualBasic;
 using Attribute = System.Attribute;
 
-namespace BotSandwich.Data
+namespace BotSandwich.Data.Commands
 {
     public abstract class Command
     {
@@ -21,17 +15,17 @@ namespace BotSandwich.Data
         public virtual string Description => "No description set.";
         public virtual string[] Examples => new string[0];
         
-        public readonly Dictionary<ArgumentAttribute, FieldInfo> ArgumentFields;
+        public readonly Tuple<ArgumentAttribute, FieldInfo>[] ArgumentFields;
 
         protected Command()
         {
-            ArgumentFields = new Dictionary<ArgumentAttribute, FieldInfo>(
+            ArgumentFields = (
                 from field in GetType().GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
                 from a in Attribute.GetCustomAttributes(field)
                 let fromArgument = a as ArgumentAttribute
                 where fromArgument != null
-                select new KeyValuePair<ArgumentAttribute, FieldInfo>(fromArgument, field)
-            );
+                select new Tuple<ArgumentAttribute, FieldInfo>(fromArgument, field)
+            ).ToArray();
         }
 
         /// <summary>
@@ -47,18 +41,16 @@ namespace BotSandwich.Data
                 Description = Description
             };
 
-            foreach (var argument in ArgumentFields)
+            foreach (var (arg, field) in ArgumentFields)
             {
-                var att = argument.Key;
-                var field = argument.Value;
-                var aliases = string.Join(", ", att.Names);
-                var title = $"Argument: {aliases} ({field.FieldType.Name}, {(att.Required ? "Required" : "Optional")}) ";
+                var aliases = string.Join(", ", arg.Names);
+                var title = $"Argument: {aliases} ({field.FieldType.Name}, {(arg.Required ? "Required" : "Optional")}) ";
                 
                 var descriptionAtt = field
                                      .GetCustomAttributes()
                                      .FirstOrDefault(a => a.GetType() == typeof(ArgumentDescriptionAttribute))
                                      as ArgumentDescriptionAttribute;
-                var description = descriptionAtt?.Description ?? "No description set.";
+                var description = descriptionAtt?.Description ?? "No description provided.";
                 
                 temp.AddField(title, description);
             }
@@ -76,16 +68,13 @@ namespace BotSandwich.Data
         /// <returns>False if errors, false if required argument not provided, else true</returns>
         public async Task ParseArguments(SocketMessage message)
         {
-            
             // foreach argument attribute
-            foreach (var attribute in ArgumentFields)
+            foreach (var (arg, field) in ArgumentFields)
             {
-                var fromArg = attribute.Key;
-                var field = attribute.Value;
-                fromArg.Provided = false;
+                arg.Provided = false;
 
                 // foreach accepted name in the argument
-                foreach (var name in fromArg.Names)
+                foreach (var name in arg.Names)
                 {
                     // check if provided
                     if(!_tryGetArgValue(message.Content, name, out var value)) continue;
@@ -95,9 +84,9 @@ namespace BotSandwich.Data
                     // try to parse the value
                     try
                     {
-                        var result = await fromArg.TryParse(value, field.FieldType, context);
+                        var result = await arg.TryParse(value, field.FieldType, context);
                         field.SetValue(this, result);
-                        fromArg.Provided = true;
+                        arg.Provided = true;
                     }
                     catch (ArgumentException e)
                     {
@@ -105,9 +94,9 @@ namespace BotSandwich.Data
                     }
                 }
 
-                if (fromArg.Required && !fromArg.Provided)
+                if (arg.Required && !arg.Provided)
                 {
-                    throw new ParseException(fromArg.Names[0], "Argument is required but was not provided.");
+                    throw new ParseException(arg.Names[0], "Argument is required but was not provided.");
                 }
             }
         }
@@ -136,7 +125,7 @@ namespace BotSandwich.Data
             return true;
         }
         
-        public bool HasArgument(string name) => ArgumentFields.Any(a => a.Key.Names.Contains(name) && a.Key.Provided);
+        public bool HasArgument(string name) => ArgumentFields.Any(a => a.Item1.Names.Contains(name) && a.Item1.Provided);
         public abstract Task Run(SocketMessage sm, string msg);
     }
 }
