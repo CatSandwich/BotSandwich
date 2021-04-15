@@ -90,7 +90,7 @@ namespace BotSandwich.Data
                     // check if provided
                     if(!_tryGetArgValue(message.Content, name, out var value)) continue;
 
-                    var context = new ArgumentAttribute.ParseContext(message);
+                    var context = new ParseContext(message);
                     
                     // try to parse the value
                     try

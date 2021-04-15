@@ -60,15 +60,15 @@ namespace BotSandwich.Data
 
             throw new ArgumentException("Argument type not parseable. Spam ping Josh cause he messed up.");
         }
+    }
 
-        public struct ParseContext
+    public struct ParseContext
+    {
+        public IMessage Message;
+
+        public ParseContext(IMessage message)
         {
-            public IMessage Message;
-
-            public ParseContext(IMessage message)
-            {
-                Message = message;
-            }
+            Message = message;
         }
     }
 }

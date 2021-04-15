@@ -13,16 +13,19 @@ namespace BotSandwich.Modules.Utils.Commands
 
         [Argument(true, "1")]
         [ArgumentDescription("The first argument")]
-        public string A1;
+        private string _a1;
 
         [Argument(true, "2")]
         [ArgumentDescription("The second argument")]
-        public string A2;
+        private string _a2;
 
         public override async Task Run(SocketMessage sm, string remainder)
         {
-            Console.WriteLine($"A1: {A1}");
-            Console.WriteLine($"A2: {A2}");
+            await Task.Run(() =>
+            {
+                Console.WriteLine($"A1: {_a1}");
+                Console.WriteLine($"A2: {_a2}");
+            });
         }
     }
 }
