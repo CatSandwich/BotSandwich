@@ -9,20 +9,24 @@ namespace BotSandwich
 {
     class Bot
     {
-        private readonly DiscordSocketClient _client;
+        public static Bot Instance;
+        
+        public readonly DiscordSocketClient Client;
 
         public Bot()
         {
-            _client = new DiscordSocketClient();
+            if(Instance != null) Console.WriteLine("Multiple Bot instances, careful.");
+            Instance = this;
+            Client = new DiscordSocketClient();
         }
 
-        public void LoadModule(Module module) => module.Load(_client);
+        public void LoadModule(Module module) => module.Load(Client);
         
         public async Task Run(string token)
         {
-            _client.Log += Log;
-            await _client.LoginAsync(TokenType.Bot, token);
-            await _client.StartAsync();
+            Client.Log += Log;
+            await Client.LoginAsync(TokenType.Bot, token);
+            await Client.StartAsync();
             await Task.Delay(-1);
         }
 

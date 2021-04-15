@@ -15,23 +15,20 @@ namespace BotSandwich.Modules.Utils.Commands
             "Repeats n messages starting from s in bold and caps for the hearing impaired.";
 
         [Argument(true, "s", "start")]
-        private ulong _s;
+        [ArgumentDescription("The message id to start at")]
+        private IMessage _s;
+        
         [Argument(true, "n", "num", "number")]
-        private uint? _n;
+        [ArgumentDescription("How many messages to repeat")]
+        private uint _n;
 
         public override async Task Run(SocketMessage sm, string remainder)
         {
             var channel = sm.Channel;
 
-            if (_n is null)
-            {
-                await channel.SendMessageAsync("Number parse failed.");
-                return;
-            }
-
             // Get n messages after message m1. Comes in newest first hence the reverse.
             IEnumerable<IMessage> messages = await channel.GetMessagesAsync(_s, Direction.After, (int)_n - 1, CacheMode.AllowDownload, RequestOptions.Default).FirstAsync();
-            messages = messages.Reverse().Prepend(await channel.GetMessageAsync(_s));
+            messages = messages.Reverse().Prepend(_s);
 
             await channel.SendMessageAsync($"**{_repeat(messages).Replace("**", "")}**");
         }

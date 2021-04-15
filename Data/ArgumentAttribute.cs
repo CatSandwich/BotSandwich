@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using Discord;
 
 namespace BotSandwich.Data
@@ -19,6 +20,7 @@ namespace BotSandwich.Data
         {
             Names = names;
             Required = required;
+            Description = "Descriptions are temporarily broken.";
         }
 
         /// <summary>
@@ -26,32 +28,47 @@ namespace BotSandwich.Data
         /// </summary>
         /// <param name="s">The value parsed</param>
         /// <param name="type">The type returned by the parse</param>
-        /// <param name="result">The parsed result</param>
-        /// <returns>Whether or not the parse was successful</returns>
-        public bool TryParse(string s, Type type, out object result)
+        /// <param name="context">Required context to parse properly</param>
+        /// <returns>The parsed data</returns>
+        /// <exception cref="ArgumentException"></exception>
+        public async Task<object> TryParse(string s, Type type, ParseContext context)
         {
             if (type == typeof(uint))
             {
-                var success = uint.TryParse(s, out var temp);
-                result = temp;
-                return success;
+                if(!uint.TryParse(s, out var temp)) throw new ArgumentException("Could not parse value as uint");
+                return temp;
             }
 
             if (type == typeof(ulong))
             {
-                var success = ulong.TryParse(s, out var temp);
-                result = temp;
-                return success;
+                if(!ulong.TryParse(s, out var temp)) throw new ArgumentException("Could not parse value as ulong");
+                return temp;
             }
 
             if (type == typeof(string))
             {
-                result = s;
-                return true;
+                return s;
             }
 
-            result = null;
-            return false;
+            if (type == typeof(IMessage))
+            {
+                if(!ulong.TryParse(s, out var id)) throw new ArgumentException("Could not parse message id as ulong");
+                var message = await context.Message.Channel.GetMessageAsync(id);
+                if (message is null) throw new ArgumentException("Could not find a message of that id");
+                return message;
+            }
+
+            throw new ArgumentException("Argument type not parseable. Spam ping Josh cause he messed up.");
+        }
+
+        public struct ParseContext
+        {
+            public IMessage Message;
+
+            public ParseContext(IMessage message)
+            {
+                Message = message;
+            }
         }
     }
 }

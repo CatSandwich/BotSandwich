@@ -14,7 +14,7 @@ namespace BotSandwich.Data
         private readonly string _prefix;
 
         private readonly EmbedBuilder _globalHelpEmbed;
-        private readonly List<EmbedBuilder> _instanceHelpEmbed;
+        private readonly List<Embed> _instanceHelpEmbed;
 
         public CommandHandler(string prefix)
         {
@@ -22,7 +22,7 @@ namespace BotSandwich.Data
             _prefix = prefix;
 
             _globalHelpEmbed = new EmbedBuilder {Title = "Commands"};
-            _instanceHelpEmbed = new List<EmbedBuilder>();
+            _instanceHelpEmbed = new List<Embed>();
         }
 
         // Registers the callback on the provided client
@@ -47,24 +47,7 @@ namespace BotSandwich.Data
             }
             
             _commands.Add(command);
-
-            // Add command's help embed
-            var temp = new EmbedBuilder
-            {
-                Title = ("Command: " + _prefix + command.Name), 
-                Description = command.Description
-            };
-
-            foreach (var argument in command.ArgumentFields.Keys)
-            {
-                var aliases = argument.Names.Aggregate("", (current, n) => current + $"{n}, ");
-                temp.AddField($"Argument: {aliases.Substring(0, aliases.Length - 2)} {(argument.Required ? "(Required)" : "(Optional)")} ", argument.Description);
-            }
-            temp.AddField("Example:", $"{_prefix}{command.Name} {command.Example}");
-
-            _instanceHelpEmbed.Add(temp);
-
-            // Add command to global help embed
+            _instanceHelpEmbed.Add(command.BuildEmbed(_prefix));
             _globalHelpEmbed.AddField(_prefix + command.Name, command.Description);
 
             return this;
@@ -75,14 +58,37 @@ namespace BotSandwich.Data
         {
             if (!sm.Content.StartsWith(_prefix)) return;
             var content = sm.Content.Substring(_prefix.Length);
-
-            Command command;
-            try { command = _commands.First(c => content.StartsWith(c.Name)); }
-            catch (InvalidOperationException) { return; }
             
-            var success = command.ParseArguments(sm.Content, out var error);
-            if (success) await command.Run(sm, content);
-            else await sm.Channel.SendMessageAsync(error);
+            var command = _commands.FirstOrDefault(c => content.StartsWith(c.Name));
+            if (command is null) return;
+
+            try
+            {
+                await command.ParseArguments(sm);
+                await command.Run(sm, content);
+            }
+            catch (ParseException e)
+            {
+                var eb = new EmbedBuilder {Color = new Color(255, 0, 0), Title = "Error!", Description = _getCheekyErrorMessage()};
+                eb.AddField($"Arg: -{e.ArgName}", $"Error: {e.Error}");
+                await sm.Channel.SendMessageAsync(embed: eb.Build());
+            }
+        }
+
+        private string _getCheekyErrorMessage()
+        {
+            string[] list =
+            {
+                "Somebody messed up...",
+                "Might wanna consult the help command...",
+                "Have you tried turning it off and on again?",
+                "Just google it",
+                "RTFM error",
+                $"{_prefix}help"
+            };
+
+            var r = new Random();
+            return list[r.Next(list.Length)];
         }
     }
 }

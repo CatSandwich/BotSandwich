@@ -2,11 +2,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Sockets;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Discord;
 using Discord.WebSocket;
 using Microsoft.VisualBasic;
 using Attribute = System.Attribute;
@@ -17,8 +19,8 @@ namespace BotSandwich.Data
     {
         public abstract string Name { get; }
         public virtual string Description => "No description set.";
-        public virtual string Example => "No example set.";
-
+        public virtual string[] Examples => new string[0];
+        
         public readonly Dictionary<ArgumentAttribute, FieldInfo> ArgumentFields;
 
         protected Command()
@@ -33,15 +35,47 @@ namespace BotSandwich.Data
         }
 
         /// <summary>
+        /// Creates a help embed.
+        /// </summary>
+        /// <param name="prefix">The prefix used in the embed</param>
+        /// <returns>The built embed object</returns>
+        public Embed BuildEmbed(string prefix)
+        {            // Add command's help embed
+            var temp = new EmbedBuilder
+            {
+                Title = $"Command: {prefix}{Name}",
+                Description = Description
+            };
+
+            foreach (var argument in ArgumentFields)
+            {
+                var att = argument.Key;
+                var field = argument.Value;
+                var aliases = string.Join(", ", att.Names);
+                var title = $"Argument: {aliases} ({field.FieldType.Name}, {(att.Required ? "Required" : "Optional")}) ";
+                
+                var descriptionAtt = field
+                                     .GetCustomAttributes()
+                                     .FirstOrDefault(a => a.GetType() == typeof(ArgumentDescriptionAttribute))
+                                     as ArgumentDescriptionAttribute;
+                var description = descriptionAtt?.Description ?? "No description set.";
+                
+                temp.AddField(title, description);
+            }
+            
+            foreach(var e in Examples) temp.AddField("Example:", $"{prefix}{Name} {e}");
+
+            return temp.Build();
+        }
+
+        /// <summary>
         /// Populates the command's argument fields given the command message
         /// </summary>
         /// <param name="message">The message searched through</param>
         /// <param name="error">Description of any errors</param>
         /// <returns>False if errors, false if required argument not provided, else true</returns>
-        public bool ParseArguments(string message, out string error)
+        public async Task ParseArguments(SocketMessage message)
         {
-            var success = true;
-            error = "";
             
             // foreach argument attribute
             foreach (var attribute in ArgumentFields)
@@ -54,28 +88,28 @@ namespace BotSandwich.Data
                 foreach (var name in fromArg.Names)
                 {
                     // check if provided
-                    if(!_tryGetArgValue(message, name, out var value)) continue;
+                    if(!_tryGetArgValue(message.Content, name, out var value)) continue;
 
+                    var context = new ArgumentAttribute.ParseContext(message);
+                    
                     // try to parse the value
-                    if (fromArg.TryParse(value, field.FieldType, out var result))
+                    try
                     {
+                        var result = await fromArg.TryParse(value, field.FieldType, context);
                         field.SetValue(this, result);
                         fromArg.Provided = true;
-                        continue;
                     }
-
-                    error += $"Failed to parse param '-{name}'.\n";
-                    success = false;
+                    catch (ArgumentException e)
+                    {
+                        throw new ParseException(name, e.Message);
+                    }
                 }
 
                 if (fromArg.Required && !fromArg.Provided)
                 {
-                    error += $"Required param '-{fromArg.Names[0]}' not provided\n";
-                    success = false;
+                    throw new ParseException(fromArg.Names[0], "Argument is required but was not provided.");
                 }
             }
-
-            return success;
         }
 
         /// <summary>
