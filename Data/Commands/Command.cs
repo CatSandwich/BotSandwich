@@ -64,7 +64,6 @@ namespace BotSandwich.Data.Commands
         /// Populates the command's argument fields given the command message
         /// </summary>
         /// <param name="message">The message searched through</param>
-        /// <param name="error">Description of any errors</param>
         /// <returns>False if errors, false if required argument not provided, else true</returns>
         public async Task ParseArguments(SocketMessage message)
         {
@@ -126,6 +125,6 @@ namespace BotSandwich.Data.Commands
         }
         
         public bool HasArgument(string name) => ArgumentFields.Any(a => a.Item1.Names.Contains(name) && a.Item1.Provided);
-        public abstract Task Run(SocketMessage sm, string msg);
+        public abstract Task Run(Module module, SocketMessage sm, string msg);
     }
 }

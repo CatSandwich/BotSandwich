@@ -23,7 +23,7 @@ namespace BotSandwich.Modules.Utils.Commands
         [ArgumentDescription("How many messages to repeat")]
         private uint _n;
 
-        public override async Task Run(SocketMessage sm, string remainder)
+        public override async Task Run(Module m, SocketMessage sm, string remainder)
         {
             var channel = sm.Channel;
 

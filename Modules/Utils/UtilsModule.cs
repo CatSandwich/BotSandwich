@@ -11,7 +11,11 @@ namespace BotSandwich.Modules.Utils
             InitCommandHandler("u!")
                 .WithCommand(new Louder())
                 .WithCommand(new Test())
+                .WithCommand(new CreateTestEmbed())
                 .WithHelp()
+                .Register(client);
+            
+            InitInputHandler()
                 .Register(client);
         }
     }

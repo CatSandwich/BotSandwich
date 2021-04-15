@@ -20,7 +20,7 @@ namespace BotSandwich.Modules.Utils.Commands
         [ArgumentDescription("The second argument")]
         private string _a2;
 
-        public override async Task Run(SocketMessage sm, string remainder)
+        public override async Task Run(Module m, SocketMessage sm, string remainder)
         {
             await Task.Run(() =>
             {

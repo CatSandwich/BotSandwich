@@ -25,7 +25,7 @@ namespace BotSandwich.Commands
         private readonly EmbedBuilder _all;
         private readonly List<Embed> _single;
 
-        public override async Task Run(SocketMessage sm, string content)
+        public override async Task Run(Module m, SocketMessage sm, string content)
         {
             if (HasArgument("command"))
             {

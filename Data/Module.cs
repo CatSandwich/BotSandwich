@@ -2,18 +2,26 @@
 using System.Collections.Generic;
 using System.Text;
 using BotSandwich.Data.Commands;
+using BotSandwich.Data.Input;
 using Discord.WebSocket;
 
 namespace BotSandwich.Data
 {
     public abstract class Module
     {
-        private CommandHandler _commandHandler;
+        public CommandHandler CommandHandler;
+        public InputHandler InputHandler;
 
         protected CommandHandler InitCommandHandler(string prefix)
         {
-            _commandHandler = new CommandHandler(prefix);
-            return _commandHandler;
+            CommandHandler = new CommandHandler(this, prefix);
+            return CommandHandler;
+        }
+
+        protected InputHandler InitInputHandler()
+        {
+            InputHandler = new InputHandler();
+            return InputHandler;
         }
         
         public abstract void Load(DiscordSocketClient client);

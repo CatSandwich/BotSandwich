@@ -10,6 +10,7 @@ namespace BotSandwich
     class Bot
     {
         public static Bot Instance;
+        public static ulong Id => Instance.Client.CurrentUser.Id;
         
         public readonly DiscordSocketClient Client;
 

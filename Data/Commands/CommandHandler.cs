@@ -10,15 +10,17 @@ namespace BotSandwich.Data.Commands
 {
     public class CommandHandler
     {
+        private readonly Module Module;
         private readonly List<Command> _commands;
         private readonly string _prefix;
 
         private readonly EmbedBuilder _globalHelpEmbed;
         private readonly List<Embed> _instanceHelpEmbed;
 
-        public CommandHandler(string prefix)
+        public CommandHandler(Module module, string prefix)
         {
             _commands = new List<Command>();
+            Module = module;
             _prefix = prefix;
 
             _globalHelpEmbed = new EmbedBuilder {Title = "Commands"};
@@ -65,7 +67,7 @@ namespace BotSandwich.Data.Commands
             try
             {
                 await command.ParseArguments(sm);
-                await command.Run(sm, content);
+                await command.Run(Module, sm, content);
             }
             catch (ParseException e)
             {
