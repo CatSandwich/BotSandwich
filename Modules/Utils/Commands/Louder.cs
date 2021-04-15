@@ -14,40 +14,9 @@ namespace BotSandwich.Modules.Utils.Commands
         public override string Description =>
             "Repeats n messages starting from s in bold and caps for the hearing impaired.";
 
-        public Louder()
-        {
-            AddArgument(new ArgumentBuilder()
-                            .WithNames("s", "start")
-                            .WithDescription("Which message to start on.")
-                            .WithCallback(_parseS)
-                            .Required()
-                            .Build()
-            );
-
-            AddArgument(new ArgumentBuilder()
-                            .WithNames("n", "num", "number")
-                            .WithDescription("How many messages to pull.")
-                            .WithCallback(_parseN)
-                            .Required()
-                            .Build()
-            );
-        }
-
-        private async Task<bool> _parseS(string value)
-        {
-            if (!ulong.TryParse(value, out var temp)) return false;
-            _s = temp;
-            return true;
-        }
-
-        private async Task<bool> _parseN(string value)
-        {
-            if (!uint.TryParse(value, out var temp)) return false;
-            _n = temp;
-            return true;
-        }
-
+        [Argument(true, "s", "start")]
         private ulong _s;
+        [Argument(true, "n", "num", "number")]
         private uint? _n;
 
         public override async Task Run(SocketMessage sm, string remainder)

@@ -12,24 +12,15 @@ namespace BotSandwich.Commands
         public override string Name => "help";
         public override string Description => "List all commands. Use 'help -c command' for info on a specific command.";
         public override string Example => "-c help";
-        public Help(EmbedBuilder all, List<EmbedBuilder> single)
+        public Help(EmbedBuilder all, List<EmbedBuilder> single) : base()
         {
             _all = all;
             _single = single;
-
-            AddArgument(new ArgumentBuilder()
-                .WithNames("command", "c")
-                .WithDescription("Get information on a specific command instead.")
-                .WithCallback(async value =>
-                {
-                    _command = value;
-                    return true;
-                })
-                .Build()
-            );
         }
 
+        [Argument(false, "c", "command")]
         private string _command;
+        
         private readonly EmbedBuilder _all;
         private readonly List<EmbedBuilder> _single;
 
@@ -37,12 +28,13 @@ namespace BotSandwich.Commands
         {
             if (HasArgument("command"))
             {
-                var EBList = _single.Where(eb => eb.Title.Contains(_command)).ToList();
-                if (EBList.Count == 0) await sm.Channel.SendMessageAsync($"Command '{_command}' not found.");
-                await sm.Channel.SendMessageAsync(embed: EBList.First().Build());
+                var ebList = _single.Where(eb => eb.Title.Contains(_command));
+                if (!ebList.Any()) await sm.Channel.SendMessageAsync($"_command '{_command}' not found.");
+                await sm.Channel.SendMessageAsync(embed: ebList.First().Build());
+                return;
             }
-            else
-                await sm.Channel.SendMessageAsync(embed: _all.Build());
+            
+            await sm.Channel.SendMessageAsync(embed: _all.Build());
         }
     }
 }

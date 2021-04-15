@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using BotSandwich.Commands;
 using Discord;
@@ -56,10 +55,10 @@ namespace BotSandwich.Data
                 Description = command.Description
             };
 
-            foreach (var a in command.Arguments)
+            foreach (var argument in command.ArgumentFields.Keys)
             {
-                var aliases = a.Name.Aggregate("", (current, n) => current + $"{n}, ");
-                temp.AddField($"Argument: {aliases.Substring(0, aliases.Length -2)} {(a.Required ? "(Required)" : "(Optional)")} ", a.Description);
+                var aliases = argument.Names.Aggregate("", (current, n) => current + $"{n}, ");
+                temp.AddField($"Argument: {aliases.Substring(0, aliases.Length - 2)} {(argument.Required ? "(Required)" : "(Optional)")} ", argument.Description);
             }
             temp.AddField("Example:", $"{_prefix}{command.Name} {command.Example}");
 
@@ -80,24 +79,10 @@ namespace BotSandwich.Data
             Command command;
             try { command = _commands.First(c => content.StartsWith(c.Name)); }
             catch (InvalidOperationException) { return; }
-
-            // Run argument callbacks
-            var success = await command.RunArguments(sm, content.Substring(command.Name.Length));
-
-            // If all arguments succeeded, run command
-            if (success)
-            {
-                await command.Run(sm, content);
-                return;
-            }
-
-            // Else tell caller which args are missing
-            var missing = command.Arguments.Where(c => c.Required && !c.Supplied);
             
-            var msg = "Missing the following args:\n";
-            foreach (var a in missing) { msg += $"\t-{a.Name[0]}\n"; }
-            
-            await sm.Channel.SendMessageAsync(msg);
+            var success = command.ParseArguments(sm.Content, out var error);
+            if (success) await command.Run(sm, content);
+            else await sm.Channel.SendMessageAsync(error);
         }
     }
 }

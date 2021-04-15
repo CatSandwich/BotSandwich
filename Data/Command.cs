@@ -1,11 +1,15 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Discord.WebSocket;
 using Microsoft.VisualBasic;
+using Attribute = System.Attribute;
 
 namespace BotSandwich.Data
 {
@@ -14,52 +18,91 @@ namespace BotSandwich.Data
         public abstract string Name { get; }
         public virtual string Description => "No description set.";
         public virtual string Example => "No example set.";
-        
-        public readonly List<Argument> Arguments = new List<Argument>();
 
-        // Runs all argument callbacks and returns whether or not they all succeed
-        public async Task<bool> RunArguments(SocketMessage sm, string msg)
+        public readonly Dictionary<ArgumentAttribute, FieldInfo> ArgumentFields;
+
+        protected Command()
+        {
+            ArgumentFields = new Dictionary<ArgumentAttribute, FieldInfo>(
+                from field in GetType().GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+                from a in Attribute.GetCustomAttributes(field)
+                let fromArgument = a as ArgumentAttribute
+                where fromArgument != null
+                select new KeyValuePair<ArgumentAttribute, FieldInfo>(fromArgument, field)
+            );
+        }
+
+        /// <summary>
+        /// Populates the command's argument fields given the command message
+        /// </summary>
+        /// <param name="message">The message searched through</param>
+        /// <param name="error">Description of any errors</param>
+        /// <returns>False if errors, false if required argument not provided, else true</returns>
+        public bool ParseArguments(string message, out string error)
         {
             var success = true;
-            foreach (var a in Arguments)
+            error = "";
+            
+            // foreach argument attribute
+            foreach (var attribute in ArgumentFields)
             {
-                a.Supplied = await _checkArgument(a, msg);
-                if (a.Required && !a.Supplied) success = false;
+                var fromArg = attribute.Key;
+                var field = attribute.Value;
+                fromArg.Provided = false;
+
+                // foreach accepted name in the argument
+                foreach (var name in fromArg.Names)
+                {
+                    // check if provided
+                    if(!_tryGetArgValue(message, name, out var value)) continue;
+
+                    // try to parse the value
+                    if (fromArg.TryParse(value, field.FieldType, out var result))
+                    {
+                        field.SetValue(this, result);
+                        fromArg.Provided = true;
+                        continue;
+                    }
+
+                    error += $"Failed to parse param '-{name}'.\n";
+                    success = false;
+                }
+
+                if (fromArg.Required && !fromArg.Provided)
+                {
+                    error += $"Required param '-{fromArg.Names[0]}' not provided\n";
+                    success = false;
+                }
             }
+
             return success;
         }
 
-        protected void AddArgument(Argument argument) => Arguments.Add(argument);
-
-        private static async Task<bool> _checkArgument(Argument arg, string msg)
+        /// <summary>
+        /// Checks for an argument in a message.
+        /// </summary>
+        /// <param name="str">The message searched through</param>
+        /// <param name="name">The argument name</param>
+        /// <param name="result">The value if the argument is provided</param>
+        /// <returns>Whether or not the argument was found</returns>
+        private static bool _tryGetArgValue(string str, string name, out string result)
         {
-            // Try Regex on all name variations of the argument
-            foreach (var name in arg.Name)
-            {
-                var quoteMatch = Regex.Match(msg, $"-{name} \"[^\"]*");
-                var noQuoteMatch = Regex.Match(msg, $"-{name} [^ ]*");
+            var quoteMatch = Regex.Match(str, $"-{name} \"[^\"]*");
+            var noQuoteMatch = Regex.Match(str, $"-{name} [^ ]*");
 
-                // If no success, try next
-                if (!quoteMatch.Success && !noQuoteMatch.Success) continue;
-                
-                // Else get value, run callback and relay its return value
-                var match = quoteMatch.Success ? quoteMatch.Value : noQuoteMatch.Value;
-                var value = _getArgValue(match, name);
-                
-                // If no callback provided, just return true
-                if (arg.Invoke == null) return true;
-                
-                return await arg.Invoke(value);
+            // If no success, try next
+            if (!quoteMatch.Success && !noQuoteMatch.Success)
+            {
+                result = "";
+                return false;
             }
 
-            // If no matches
-            return false;
+            var match = quoteMatch.Success ? quoteMatch.Value : noQuoteMatch.Value;
+            result = match.Replace("\"", "").Substring(name.Length + 2);
+            return true;
         }
-
-        // Remove space, dash, and arg name from content
-        private static string _getArgValue(string str, string argName) => str.Replace("\"", "").Substring(argName.Length + 2);
-        protected bool HasArgument(string name) => Arguments.First(a => a.Name.Any(n => n == name)).Supplied;
-
+        
+        public bool HasArgument(string name) => ArgumentFields.Any(a => a.Key.Names.Contains(name) && a.Key.Provided);
         public abstract Task Run(SocketMessage sm, string msg);
     }
 }
