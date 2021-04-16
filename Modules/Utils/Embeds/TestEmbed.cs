@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using BotSandwich.Data.Input;
 using Discord;
 using Discord.WebSocket;
@@ -16,7 +13,7 @@ namespace BotSandwich.Modules.Utils.Embeds
         private async Task _checkmark(IUserMessage message, ISocketMessageChannel channel)
         {
             await channel.SendMessageAsync("Accepted");
-            Remove?.Invoke(message.Id);
+            Remove();
         }
 
         [Choice("❎")]

@@ -16,7 +16,7 @@ namespace BotSandwich.Data.Input
         public abstract Embed Embed { get; }
 
         public IUserMessage Message;
-        public Func<ulong, bool> Remove;
+        public Func<bool> Remove;
         
         public InputEmbed()
         {

@@ -27,7 +27,7 @@ namespace BotSandwich.Data.Input
         {
             var message = await channel.SendMessageAsync(embed: embed.Embed);
             embed.Message = message;
-            embed.Remove = Embeds.Remove;
+            embed.Remove = () => Embeds.Remove(embed.Message.Id);
             
             foreach (var (att, _) in embed.ChoiceMethods)
             {
