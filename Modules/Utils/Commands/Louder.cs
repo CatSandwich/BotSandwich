@@ -9,6 +9,7 @@ using Discord.WebSocket;
 namespace BotSandwich.Modules.Utils.Commands
 {
     // Repeats a group of messages in bold and caps.
+    [Command(typeof(UtilsModule))]
     class Louder : Command
     {
         public override string Name => "louder";

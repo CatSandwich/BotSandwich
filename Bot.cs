@@ -21,7 +21,7 @@ namespace BotSandwich
             Client = new DiscordSocketClient();
         }
 
-        public void LoadModule(Module module) => module.Load(Client);
+        public void LoadModule(Type module) => Activator.CreateInstance(module, Client);
         
         public async Task Run(string token)
         {

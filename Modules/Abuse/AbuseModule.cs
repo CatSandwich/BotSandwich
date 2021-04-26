@@ -7,14 +7,13 @@ using Discord.WebSocket;
 
 namespace BotSandwich.Modules.Abuse
 {
-    class AbuseModule : Module
+    sealed class AbuseModule : Module
     {
-        public override void Load(DiscordSocketClient client)
+        protected override string CommandPrefix => "a!";
+
+        public AbuseModule(DiscordSocketClient client) : base(client)
         {
-            InitCommandHandler("a!")
-                .WithCommand(new Admin())
-                .WithHelp()
-                .Register(client);
+            
         }
     }
 }

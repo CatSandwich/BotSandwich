@@ -10,12 +10,13 @@ using Discord.WebSocket;
 
 namespace BotSandwich.Modules.Abuse.Commands
 {
+    [Command(typeof(AbuseModule))]
     class Admin : Command
     {
         public override string Name => "admin";
 
         [Argument(true, "name")]
-        public string _roleName;
+        private string _roleName;
         
         public override async Task Run(Module module, SocketMessage sm, string msg)
         {

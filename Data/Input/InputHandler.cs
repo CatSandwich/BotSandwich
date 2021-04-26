@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
@@ -12,13 +11,9 @@ namespace BotSandwich.Data.Input
     {
         public Dictionary<ulong, InputEmbed> Embeds;
 
-        public InputHandler()
+        public InputHandler(DiscordSocketClient client)
         {
             Embeds = new Dictionary<ulong, InputEmbed>();
-        }
-        
-        public void Register(DiscordSocketClient client)
-        {
             client.ReactionAdded += _reactionAdded;
             client.MessageDeleted += _messageDeleted;
         }
@@ -48,7 +43,7 @@ namespace BotSandwich.Data.Input
 
         private async Task _messageDeleted(Cacheable<IMessage, ulong> cacheable, ISocketMessageChannel channel)
         {
-            Embeds.Remove(cacheable.Id);
+            await Task.Run(() => Embeds.Remove(cacheable.Id));
         }
     }
 }

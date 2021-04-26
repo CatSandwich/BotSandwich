@@ -5,7 +5,6 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
-using Attribute = System.Attribute;
 
 namespace BotSandwich.Data.Commands
 {
@@ -115,7 +114,7 @@ namespace BotSandwich.Data.Commands
             // If no success, try next
             if (!quoteMatch.Success && !noQuoteMatch.Success)
             {
-                result = "";
+                result = null;
                 return false;
             }
 

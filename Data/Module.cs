@@ -9,21 +9,16 @@ namespace BotSandwich.Data
 {
     public abstract class Module
     {
+        protected virtual bool UseHelpCommand => true;
+        protected abstract string CommandPrefix { get; }
+        
         public CommandHandler CommandHandler;
         public InputHandler InputHandler;
 
-        protected CommandHandler InitCommandHandler(string prefix)
+        protected Module(DiscordSocketClient client)
         {
-            CommandHandler = new CommandHandler(this, prefix);
-            return CommandHandler;
+            CommandHandler = new CommandHandler(client, CommandPrefix, UseHelpCommand, this);
+            InputHandler = new InputHandler(client);
         }
-
-        protected InputHandler InitInputHandler()
-        {
-            InputHandler = new InputHandler();
-            return InputHandler;
-        }
-        
-        public abstract void Load(DiscordSocketClient client);
     }
 }

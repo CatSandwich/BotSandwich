@@ -9,6 +9,7 @@ using Discord.WebSocket;
 
 namespace BotSandwich.Modules.Utils.Commands
 {
+    [Command(typeof(UtilsModule))]
     class CreateTestEmbed : Command
     {
         public override string Name => "createembed";

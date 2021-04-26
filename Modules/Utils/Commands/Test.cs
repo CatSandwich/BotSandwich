@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+using System.Reflection.Metadata;
 using System.Threading.Tasks;
 using BotSandwich.Data;
 using BotSandwich.Data.Commands;
@@ -6,6 +8,7 @@ using Discord.WebSocket;
 
 namespace BotSandwich.Modules.Utils.Commands
 {
+    [Command(typeof(UtilsModule))]
     class Test : Command
     {
         public override string Name => "test";

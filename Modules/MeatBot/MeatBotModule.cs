@@ -6,10 +6,12 @@ using Discord.WebSocket;
 
 namespace BotSandwich.Modules.MeatBot
 {
-    class MeatBotModule : Module
+    sealed class MeatBotModule : Module
     {
+        protected override string CommandPrefix => "m!";
         private AudioClips _audioClips;
-        public override void Load(DiscordSocketClient client)
+
+        public MeatBotModule(DiscordSocketClient client) : base(client)
         {
             _audioClips = new AudioClips(client);
         }

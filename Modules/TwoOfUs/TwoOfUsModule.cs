@@ -4,10 +4,12 @@ using Discord.WebSocket;
 
 namespace BotSandwich.Modules.TwoOfUs
 {
-    class TwoOfUsModule : Module
+    sealed class TwoOfUsModule : Module
     {
         private AudioHandler _audioHandler;
-        public override void Load(DiscordSocketClient client)
+        protected override string CommandPrefix => "2!";
+
+        public TwoOfUsModule(DiscordSocketClient client) : base(client)
         {
             _audioHandler = new AudioHandler(client);
         }

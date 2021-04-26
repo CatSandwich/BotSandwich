@@ -4,19 +4,13 @@ using Discord.WebSocket;
 
 namespace BotSandwich.Modules.Utils
 {
-    class UtilsModule : Module
+    sealed class UtilsModule : Module
     {
-        public override void Load(DiscordSocketClient client)
+        protected override string CommandPrefix => "u!";
+        public UtilsModule(DiscordSocketClient client) : base(client)
         {
-            InitCommandHandler("u!")
-                .WithCommand(new Louder())
-                .WithCommand(new Test())
-                .WithCommand(new CreateTestEmbed())
-                .WithHelp()
-                .Register(client);
             
-            InitInputHandler()
-                .Register(client);
         }
+
     }
 }
