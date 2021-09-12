@@ -1,15 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace BotSandwich.Data.Commands
+namespace BotSandwich.Data.Commands.Attributes
 {
-    class CommandAttribute : Attribute
+    public class CommandAttribute : Attribute
     {
-        public Type Module;
-        public CommandAttribute(Type module)
+        public string Name;
+        public CommandAttribute(string name = "")
         {
-            Module = module;
+            Name = name;
         }
     }
 }

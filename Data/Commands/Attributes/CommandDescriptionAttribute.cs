@@ -2,10 +2,10 @@
 
 namespace BotSandwich.Data.Commands.Attributes
 {
-    public class ArgumentDescriptionAttribute : Attribute
+    public class CommandDescriptionAttribute : Attribute
     {
         public string Description;
-        public ArgumentDescriptionAttribute(string description)
+        public CommandDescriptionAttribute(string description)
         {
             Description = description;
         }

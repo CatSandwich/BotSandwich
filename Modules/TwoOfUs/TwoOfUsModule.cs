@@ -1,5 +1,4 @@
 ﻿using BotSandwich.Data;
-using BotSandwich.Modules.Utils.Commands;
 using Discord.WebSocket;
 
 namespace BotSandwich.Modules.TwoOfUs
@@ -9,8 +8,9 @@ namespace BotSandwich.Modules.TwoOfUs
         private AudioHandler _audioHandler;
         protected override string CommandPrefix => "2!";
 
-        public TwoOfUsModule(DiscordSocketClient client) : base(client)
+        public override void Init(DiscordSocketClient client)
         {
+            base.Init(client);
             _audioHandler = new AudioHandler(client);
         }
     }

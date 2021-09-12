@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using BotSandwich.Data.Commands;
+using BotSandwich.Data.Input.Attributes;
 using Discord;
 using Discord.WebSocket;
 
@@ -29,7 +30,7 @@ namespace BotSandwich.Data.Input
             ).ToArray();
         }
 
-        public async Task OnReact(IUserMessage message, ISocketMessageChannel channel, SocketReaction reaction)
+        public async Task OnReact(IUserMessage message, IMessageChannel channel, SocketReaction reaction)
         {
             foreach (var (choice, method) in ChoiceMethods)
             {

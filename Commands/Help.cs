@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿/*using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BotSandwich.Data;
@@ -38,4 +38,4 @@ namespace BotSandwich.Commands
             await sm.Channel.SendMessageAsync(embed: _all.Build());
         }
     }
-}
+}*/

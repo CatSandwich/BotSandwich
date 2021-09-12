@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using BotSandwich.Data;
 using Discord;
@@ -7,7 +6,7 @@ using Discord.WebSocket;
 
 namespace BotSandwich
 {
-    class Bot
+    public class Bot
     {
         public static Bot Instance;
         public static ulong Id => Instance.Client.CurrentUser.Id;
@@ -21,7 +20,12 @@ namespace BotSandwich
             Client = new DiscordSocketClient();
         }
 
-        public void LoadModule(Type module) => Activator.CreateInstance(module, Client);
+        public TModule LoadModule<TModule>() where TModule : Module, new()
+        {
+            var module = new TModule();
+            module.Init(Client);
+            return module;
+        }
         
         public async Task Run(string token)
         {

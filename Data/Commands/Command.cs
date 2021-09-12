@@ -1,4 +1,4 @@
-﻿using System;
+﻿/*using System;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
@@ -82,7 +82,7 @@ namespace BotSandwich.Data.Commands
                     // try to parse the value
                     try
                     {
-                        var result = await arg.TryParse(value, field.FieldType, context);
+                        var result = await ArgumentAttribute.TryParse(value, field.FieldType, context);
                         field.SetValue(this, result);
                         arg.Provided = true;
                     }
@@ -106,7 +106,7 @@ namespace BotSandwich.Data.Commands
         /// <param name="name">The argument name</param>
         /// <param name="result">The value if the argument is provided</param>
         /// <returns>Whether or not the argument was found</returns>
-        private static bool _tryGetArgValue(string str, string name, out string result)
+        public static bool _tryGetArgValue(string str, string name, out string result)
         {
             var quoteMatch = Regex.Match(str, $"-{name} \"[^\"]*");
             var noQuoteMatch = Regex.Match(str, $"-{name} [^ ]*");
@@ -119,7 +119,7 @@ namespace BotSandwich.Data.Commands
             }
 
             var match = quoteMatch.Success ? quoteMatch.Value : noQuoteMatch.Value;
-            result = match.Replace("\"", "").Substring(name.Length + 2);
+            result = match.Replace("\"", "")[(name.Length + 2)..];
             return true;
         }
         
@@ -127,3 +127,4 @@ namespace BotSandwich.Data.Commands
         public abstract Task Run(Module module, SocketMessage sm, string msg);
     }
 }
+*/

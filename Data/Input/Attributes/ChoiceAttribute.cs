@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace BotSandwich.Data.Input
+namespace BotSandwich.Data.Input.Attributes
 {
     public class ChoiceAttribute : Attribute
     {

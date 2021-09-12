@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Discord;
 
-namespace BotSandwich.Data.Commands
+namespace BotSandwich.Data.Commands.Attributes
 {
     /// <summary>
     /// Tells the command to listen for an argument and populate this field when provided.
@@ -29,8 +29,14 @@ namespace BotSandwich.Data.Commands
         /// <param name="context">Required context to parse properly</param>
         /// <returns>The parsed data</returns>
         /// <exception cref="ArgumentException"></exception>
-        public async Task<object> TryParse(string s, Type type, ParseContext context)
+        public static async Task<object> TryParse(string s, Type type, ParseContext context)
         {
+            if (type == typeof(int))
+            {
+                if (!int.TryParse(s, out var temp)) throw new ArgumentException("Could not parse value as int");
+                return temp;
+            }
+            
             if (type == typeof(uint))
             {
                 if(!uint.TryParse(s, out var temp)) throw new ArgumentException("Could not parse value as uint");
@@ -56,7 +62,7 @@ namespace BotSandwich.Data.Commands
                 return message;
             }
 
-            throw new ArgumentException("Argument type not parseable. Spam ping Josh cause he messed up.");
+            throw new ArgumentException($"Argument type {type.AssemblyQualifiedName} not parseable. Spam ping CatSandwich cause he messed up.");
         }
     }
 

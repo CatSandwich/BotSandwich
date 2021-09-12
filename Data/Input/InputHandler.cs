@@ -31,17 +31,17 @@ namespace BotSandwich.Data.Input
             Embeds.Add(message.Id, embed);
         }
         
-        private async Task _reactionAdded(Cacheable<IUserMessage, ulong> cacheable, ISocketMessageChannel channel, SocketReaction reaction)
+        private async Task _reactionAdded(Cacheable<IUserMessage, ulong> cacheable, Cacheable<IMessageChannel, ulong> channel, SocketReaction reaction)
         {
             if (reaction.UserId == Bot.Id) return;
             
             var embed = Embeds.FirstOrDefault(e => e.Key == cacheable.Id).Value;
             if (embed is null) return;
 
-            await embed.OnReact(await cacheable.GetOrDownloadAsync(), channel, reaction);
+            await embed.OnReact(await cacheable.GetOrDownloadAsync(), await channel.GetOrDownloadAsync(), reaction);
         }
 
-        private async Task _messageDeleted(Cacheable<IMessage, ulong> cacheable, ISocketMessageChannel channel)
+        private async Task _messageDeleted(Cacheable<IMessage, ulong> cacheable, Cacheable<IMessageChannel, ulong> channel)
         {
             await Task.Run(() => Embeds.Remove(cacheable.Id));
         }

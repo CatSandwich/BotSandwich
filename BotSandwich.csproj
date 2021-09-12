@@ -1,12 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
+    <OutputType>Library</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Discord.Net" Version="2.3.1" />
+    <PackageReference Include="Discord.Net" Version="3.0.0-dev-20210710.3" />
+    <PackageReference Include="Google.Apis.Sheets.v4" Version="1.51.0.2272" />
   </ItemGroup>
 
   <ItemGroup>
